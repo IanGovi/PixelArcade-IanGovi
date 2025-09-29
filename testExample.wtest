@@ -1,0 +1,100 @@
+import maquinas.*
+import jugadores.*
+import arcade.*
+
+
+
+
+describe "Tests primera parte" {
+  test "Zoe puede jugar Realidad Virtual Zombie Attack, pero Milo y Dana no. " {
+    assert.that(zombieAttack.puedeJugar(zoe))
+    assert.notThat(zombieAttack.puedeJugar(milo))
+    assert.notThat(zombieAttack.puedeJugar(dana))
+  }
+
+  test "Luego de jugar con la Cabina de Sala de escape, las pistas no están acomodadas. " {
+    salaDeEscape.usar(zoe)
+    assert.notThat(salaDeEscape.pistasAcomodadas())
+  }
+
+  test "Si alguien utiliza el Simulador de Vuelo Espacial su batería queda en 50. Comprobar aparte que luego de cargarla una hora, su batería vuelve a estar en 100 " {
+    vueloEspacial.usar(milo)
+    assert.equals(50, vueloEspacial.bateria())
+    vueloEspacial.cargar(1)
+    assert.equals(100, vueloEspacial.bateria())
+
+  }
+
+  test "Comprobar que Milo tiene ganas de jugar al Simulador de Vuelo Espacial si la nave seleccionada es la de exploración y que no quiere si hay otra seleccionada. " {
+    vueloEspacial.cambiarNave(naveDeExploracion)
+    assert.that(milo.tieneGanasDejugarVueloEspacial())
+    vueloEspacial.cambiarNave(naveDeCombate)
+    assert.notThat(milo.tieneGanasDejugarVueloEspacial())
+  }
+}
+
+describe "Tests segunda parte" {
+  test "Se registra la entrada de Milo" {
+    arcade.registrarEntrada(milo)
+    assert.that(arcade.jugadores().contains(milo))
+  }
+  test "se registra la salida de milo despues de haber entrado" {
+    arcade.registrarEntrada(milo)
+    arcade.registrarSalida(milo)
+    assert.notThat(arcade.jugadores().contains(milo))
+  }
+  test "El arcade esta lleno" {
+    arcade.registrarEntrada(milo)
+    arcade.registrarEntrada(dana)
+    arcade.registrarEntrada(zoe)
+    assert.that(arcade.arcadeEstaLleno())
+  }
+  test "El arcade esta vacio" {
+    assert.that(arcade.arcadeEstaVacio())
+  }
+}
+
+describe "Tercera parte" {
+    test "Maquinas que necesitan reparacion" {
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        assert.equals(#{zombieAttack}, arcade.maquinasQueNecesitanReparacion())
+    }
+    
+    test "Maquina más nueva y más antigua" {
+        assert.equals(salaDeEscape, arcade.maquinaMasNueva())
+        assert.equals(zombieAttack, arcade.maquinaMasAntigua())
+    }
+
+    test "Cuantas máquinas son vintage" {
+        assert.equals(2, arcade.cantidadDeMaquinasVintage())
+    }
+
+    test "Maquina con menos del 50 de energia" {
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        assert.equals(zombieAttack, arcade.maquinaQueTieneMenosDe50DeEnergia())
+    }
+
+    test "Cerrar el local" {
+        arcade.registrarEntrada(zoe)
+        arcade.registrarEntrada(dana)
+        arcade.registrarEntrada(milo)
+        zombieAttack.usar(zoe)
+        zombieAttack.usar(zoe)
+        vueloEspacial.usar(milo)
+        arcade.cerrarElLocal()
+        assert.that(arcade.arcadeEstaVacio())
+        assert.equals(100, zombieAttack.bateria())
+        assert.equals(100, vueloEspacial.bateria())
+    }
+}
